@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:17
+    volumes: 
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: ashenafi
+      POSTGRES_PASSWORD: ashu3079
+    ports:
+      - "5432:5432"
+  web:
+    build: .
+    container_name: movie_recommender
+    command: gunicorn movie_recommendation_web.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.docker
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    environment: 
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672" # RabbitMQ admin UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  worker:
+    build: .
+    command: celery -A movie_recommendation_web worker --loglevel=info
+    volumes: 
+      - .:/app
+    depends_on:
+      - web
+      - rabbitmq
+      - redis
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+volumes:
+  postgres_data: {}
+
+  
