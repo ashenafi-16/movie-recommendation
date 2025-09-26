@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Social Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .welcome { background: #e8f5e8; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .logout-btn { background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .login-buttons { display: flex; gap: 15px; margin-top: 20px; }
+        .social-btn { padding: 12px 24px; text-decoration: none; border-radius: 5px; color: white; font-weight: bold; }
+        .google { background: #694946; }
+        .facebook { background: #4267B2; }
+    </style>
+</head>
+<body>
+    <h1>Social Login</h1>
+
+    {% if user.is_authenticated %}
+        <div class="welcome">
+            <p><strong>Welcome, {{ user.name }}</strong></p>
+            <p>Email: {{ user.email }}</p>
+            <p>Provider: {{ user.oauth_provider|default:"Email" }}</p>
+
+            <!-- Logout form -->
+            <form id="logout-form" action="{% url 'logout' %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    {% else %}
+        <p>Please login with your account:</p>
+        <div class="login-buttons">
+            <a href="{% url 'social:begin' 'google-oauth2' %}?prompt=select_account" class="social-btn google">
+                Login with Google
+            </a>
+            <a href="{% url 'social:begin' 'facebook' %}" class="social-btn facebook">
+                Login with Facebook
+            </a>
+        </div>
+    {% endif %}
+</body>
+</html>

@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
+
 import os
 import environ
 from pathlib import Path
@@ -33,21 +35,28 @@ DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
-
-INSTALLED_APPS = [
+DJANGO_APP = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'account',
+]
+CUSTOM_APP = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'rest_framework.authtoken',    
+    'accounts.apps.AccountConfig',
 ]
+
+THIRD_PARTY_APP = [
+    "social_django",
+    
+]
+
+INSTALLED_APPS = CUSTOM_APP + DJANGO_APP + THIRD_PARTY_APP
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,23 +67,30 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+
     # after using Nginx (caching ) remove it
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
+
 ]
+
 
 ROOT_URLCONF = 'movie_recommendation_web.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'movie_recommendation_web', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'social_django.context_processors.backends',  # required
+                'social_django.context_processors.login_redirect', 
             ],
         },
     },
@@ -86,7 +102,7 @@ WSGI_APPLICATION = 'movie_recommendation_web.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-AUTH_USER_MODEL = 'account.CustomUser'
+AUTH_USER_MODEL = 'accounts.CustomUser'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -171,13 +187,13 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',
     'AUTH_COOKIE_DOMAIN': None,
-    'AUTH_COOKIE_SAMESITE': 'Strict',
+    'AUTH_COOKIE_SAMESITE': 'Lax',
     'AUTH_TOKEN_LIFETIME': timedelta(minutes=180),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH-TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',
-    'AUTH_HEADER_TYPES': ('Bearer',)
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 # CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@rabbitmq:5672//')
 # CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
@@ -196,5 +212,79 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.facebook.FacebookOAuth2',
+
+    'social_core.backends.google.GoogleOAuth2',  # Google OAuth2 backend
+    'django.contrib.auth.backends.ModelBackend', # default Django auth
+)
+
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+
+
+SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get('FACEBOOK_KEY', "")
+SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get('FACEBOOK_SECRET', "")
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://127.0.0.1:8000/oauth/complete/google-oauth2/'
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
+SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
+    'access_type': 'online',
+}
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
+    'prompt': 'select_account'
+}
+
+# URL to show the login page (GET)
+LOGIN_URL = '/'  
+
+# After successful login, redirect here (GET)
+LOGIN_REDIRECT_URL = '/'  # e.g., home page
+
+# After logout, redirect here (GET)
+LOGOUT_REDIRECT_URL = '/'  
+
+# Social auth login redirect (Google, etc.)
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'  # e.g., home page
+
 # settings.py
+
+SOCIAL_AUTH_PIPELINE = (
+    # Get social auth details
+    'social_core.pipeline.social_auth.social_details',
+    
+    # Get UID from provider
+    'social_core.pipeline.social_auth.social_uid',
+
+    # Check if social account exists
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+
+    # Custom: link to existing user by email
+    'accounts.pipeline.link_to_existing_user_by_email',
+
+    # Custom: create user if new
+    'social_core.pipeline.user.create_user',
+
+    # Custom: save provider name and fullname
+    'accounts.pipeline.save_oauth_provider_and_name',
+
+    # Custom: store JWT tokens in session/cookies if needed
+    'accounts.pipeline.store_jwt_tokens_in_session',
+
+    # Custom: enqueue avatar fetch only if missing
+    'accounts.pipeline.enqueue_avatar_task',
+)
 

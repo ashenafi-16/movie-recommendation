@@ -22,6 +22,7 @@ gunicorn==23.0.0
 idna==3.10
 kombu==5.5.4
 packaging==25.0
+pillow==11.3.0
 prompt_toolkit==3.0.52
 psycopg2-binary==2.9.10
 PyJWT==2.10.1
@@ -37,4 +38,3 @@ urllib3==2.5.0
 vine==5.1.0
 wcwidth==0.2.13
 whitenoise==6.10.0
-redis>=5.0.0

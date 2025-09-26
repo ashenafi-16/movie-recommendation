@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.shortcuts import render
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/", include("account.urls")),
+    path("api/", include("accounts.urls")),
+    path('oauth/', include('social_django.urls', namespace='social')),
+    path('', TemplateView.as_view(template_name='home.html'), name='home'),  # Home page
 ]
