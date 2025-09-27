@@ -1,6 +1,5 @@
 import uuid
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 
 class MovieReference(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -11,7 +10,7 @@ class MovieReference(models.Model):
     release_date = models.DateField(null=True, blank=True)
     popularity = models.FloatField(default=0.0)
     last_synced_at = models.DateTimeField(null=True, blank=True)
-    raw = JSONField(null=True, blank=True) # raw TMDB paload
+    raw = models.JSONField(null=True, blank=True) # raw TMDB paload
 
     class Meta:
         db_table = 'movie_reference'

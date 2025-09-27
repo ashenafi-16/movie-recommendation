@@ -49,6 +49,7 @@ CUSTOM_APP = [
     'corsheaders',
     'rest_framework.authtoken',    
     'accounts.apps.AccountConfig',
+    'movies',
 ]
 
 THIRD_PARTY_APP = [
