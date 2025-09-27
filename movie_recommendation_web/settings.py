@@ -50,6 +50,7 @@ CUSTOM_APP = [
     'rest_framework.authtoken',    
     'accounts.apps.AccountConfig',
     'movies',
+    'interactions',
 ]
 
 THIRD_PARTY_APP = [
@@ -174,12 +175,21 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True   # MUST for cookies across origins
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATIOIN_CLASSES': (
+#        'movie_recommender.auth.CustomCookieJWTAuthentication',
+#        'rest_framework_simplejwt.authentication.JWTAuthentication', 
+#     ),
+#     'DEFAULT_PERMISSION_CLASSES':('rest_framework.permissions.IsAuthenticated',),
+# }
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATIOIN_CLASSES': (
-       'movie_recommender.auth.CustomCookieJWTAuthentication',
-       'rest_framework_simplejwt.authentication.JWTAuthentication', 
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',  # optional
     ),
-    'DEFAULT_PERMISSION_CLASSES':('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 SIMPLE_JWT = {
     'AUTH_COOKIE_ACCESS': 'access_token',           # Access token cookie name
@@ -189,7 +199,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_PATH': '/',
     'AUTH_COOKIE_DOMAIN': None,
     'AUTH_COOKIE_SAMESITE': 'Lax',
-    'AUTH_TOKEN_LIFETIME': timedelta(minutes=180),
+    'AUTH_TOKEN_LIFETIME': timedelta(minutes=280),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH-TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -288,4 +298,5 @@ SOCIAL_AUTH_PIPELINE = (
     # Custom: enqueue avatar fetch only if missing
     'accounts.pipeline.enqueue_avatar_task',
 )
+
 
