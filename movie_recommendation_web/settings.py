@@ -51,6 +51,7 @@ CUSTOM_APP = [
     'accounts.apps.AccountConfig',
     'movies',
     'interactions',
+    'watch'
 ]
 
 THIRD_PARTY_APP = [
