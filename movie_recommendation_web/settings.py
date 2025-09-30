@@ -16,6 +16,7 @@ import environ
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -160,8 +161,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # TMDB for movie API key
-TMDB_API_KEY = '2a8564a8cddfad3a7f01f71fffc82c53'
-TMDB_API_BASE_URL = 'https://api.themoviedb.org/3'
+TMDB_API_KEY = env("TMDB_API_KEY")
+TMDB_API_BASE_URL = env("TMDB_API_BASE_URL")
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -171,13 +172,8 @@ CORS_ALLOWED_ORIGINS = [
 
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_CREDENTIALS = True   # MUST for cookies across origins
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATIOIN_CLASSES': (
-#        'movie_recommender.auth.CustomCookieJWTAuthentication',
-#        'rest_framework_simplejwt.authentication.JWTAuthentication', 
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES':('rest_framework.permissions.IsAuthenticated',),
-# }
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -204,7 +200,17 @@ SIMPLE_JWT = {
 }
 # CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@rabbitmq:5672//')
 # CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
-
+REDIS_URL = env("REDIS_URL")
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": urlparse(REDIS_URL).password,  # Extract password if set
+        }
+    }
+}
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -254,44 +260,21 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
     'prompt': 'select_account'
 }
 
-# URL to show the login page (GET)
 LOGIN_URL = '/'  
-
-# After successful login, redirect here (GET)
-LOGIN_REDIRECT_URL = '/'  # e.g., home page
-
-# After logout, redirect here (GET)
+LOGIN_REDIRECT_URL = '/'  
 LOGOUT_REDIRECT_URL = '/'  
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'  
 
-# Social auth login redirect (Google, etc.)
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'  # e.g., home page
-
-# settings.py
 
 SOCIAL_AUTH_PIPELINE = (
-    # Get social auth details
     'social_core.pipeline.social_auth.social_details',
-    
-    # Get UID from provider
     'social_core.pipeline.social_auth.social_uid',
-
-    # Check if social account exists
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
-
-    # Custom: link to existing user by email
     'accounts.pipeline.link_to_existing_user_by_email',
-
-    # Custom: create user if new
     'social_core.pipeline.user.create_user',
-
-    # Custom: save provider name and fullname
     'accounts.pipeline.save_oauth_provider_and_name',
-
-    # Custom: store JWT tokens in session/cookies if needed
     'accounts.pipeline.store_jwt_tokens_in_session',
-
-    # Custom: enqueue avatar fetch only if missing
     'accounts.pipeline.enqueue_avatar_task',
 )
 
