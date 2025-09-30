@@ -3,56 +3,59 @@ version: '3.9'
 services:
   db:
     image: postgres:17
+    container_name: movie_postgres
     volumes: 
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: movie_recomendation
-      POSTGRES_USER: movie_recommendation_web
-      POSTGRES_PASSWORD: dYsYa9HGi64jaclM99TlYGWQpPf9ruuG
+      POSTGRES_DB: movie_recommendation
+      POSTGRES_USER: movie_user
+      POSTGRES_PASSWORD: movie_password
     ports:
       - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: movie_redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: movie_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
   web:
     build: .
-    container_name: movie_recommender
-    command: gunicorn movie_recommendation_web.wsgi:application --bind 0.0.0.0:8000
+    container_name: movie_web
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     env_file:
-      - .env.docker
+      - .env.dev
     depends_on:
       - db
       - redis
       - rabbitmq
-    environment: 
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672" # RabbitMQ admin UI
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+
   worker:
     build: .
+    container_name: movie_worker
     command: celery -A movie_recommendation_web worker --loglevel=info
-    volumes: 
+    volumes:
       - .:/app
     depends_on:
       - web
-      - rabbitmq
       - redis
-    environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - rabbitmq
+    env_file:
+      - .env.dev
+
 volumes:
   postgres_data: {}
-
-  
