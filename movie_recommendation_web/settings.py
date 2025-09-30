@@ -35,7 +35,6 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
 
 DJANGO_APP = [
     'django.contrib.admin',
@@ -169,7 +168,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://your-frontend.example",
     "http://localhost:3000",
 ]
-
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 CORS_ALLOW_CREDENTIALS = True   # MUST for cookies across origins
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATIOIN_CLASSES': (
