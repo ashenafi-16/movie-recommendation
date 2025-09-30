@@ -1,4 +1,6 @@
 /venv/
-.env
+.env.prod
+.env.dev
+.env.production
 .env.docker
 db.sqlite3
