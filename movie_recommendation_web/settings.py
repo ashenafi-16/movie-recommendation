@@ -77,7 +77,8 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
 
     # after using Nginx (caching ) remove it
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
+
 
 
 ]
@@ -277,5 +278,13 @@ SOCIAL_AUTH_PIPELINE = (
     'accounts.pipeline.store_jwt_tokens_in_session',
     'accounts.pipeline.enqueue_avatar_task',
 )
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
+# For production
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
