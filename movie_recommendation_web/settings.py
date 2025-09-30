@@ -169,7 +169,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['*']
 CORS_ALLOW_CREDENTIALS = True   # MUST for cookies across origins
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATIOIN_CLASSES': (
