@@ -29,4 +29,6 @@ urlpatterns = [
     path('api/', include('preferences.urls')),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),  # Home page
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+
 ]
