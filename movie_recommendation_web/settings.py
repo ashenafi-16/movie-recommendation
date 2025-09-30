@@ -183,6 +183,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',  # Only JSON, no HTML
+    ),
 }
 SIMPLE_JWT = {
     'AUTH_COOKIE_ACCESS': 'access_token',           # Access token cookie name
