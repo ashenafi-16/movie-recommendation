@@ -11,7 +11,8 @@ class MovieReference(models.Model):
     popularity = models.FloatField(default=0.0)
     last_synced_at = models.DateTimeField(null=True, blank=True)
     raw = models.JSONField(null=True, blank=True) # raw TMDB paload
-
+    length = models.PositiveIntegerField(null=True, blank=True)
+    views_count = models.PositiveIntegerField(default=0)
     class Meta:
         db_table = 'movie_reference'
         indexes = [
@@ -27,4 +28,5 @@ class MovieReference(models.Model):
             return None
         
         base = "https://image.tmdb.org/t/p"
-        return f"{base}{size}{self.poster_path}"
+        return f"{base}/{size}{self.poster_path}"
+    

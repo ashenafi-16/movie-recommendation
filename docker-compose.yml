@@ -6,9 +6,9 @@ services:
     volumes: 
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: ashenafi
-      POSTGRES_PASSWORD: ashu3079
+      POSTGRES_DB: movie_recomendation
+      POSTGRES_USER: movie_recommendation_web
+      POSTGRES_PASSWORD: dYsYa9HGi64jaclM99TlYGWQpPf9ruuG
     ports:
       - "5432:5432"
   web:

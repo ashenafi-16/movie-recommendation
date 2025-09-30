@@ -22,7 +22,6 @@ class WatchHistory(models.Model):
             models.Index(fields=["user", "movie"]),
             models.Index(fields=['movie', 'watched_at']),
         ]
-        ordering = ["-watched_at"]
-        
+        ordering = ["-watched_at"]        
         def __str__(self):
             return f"watchHistory(user={self.user_id}, movie={self.movie_id}, at={self.watched_at.isoformat()})"

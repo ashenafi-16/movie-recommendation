@@ -9,7 +9,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class MovieDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = MovieDetail
-        fields = ['overview', 'runtime', 'original_language', 'vote_average', 'vote_count']
+        fields = ['id','overview', 'runtime', 'original_language', 'vote_average', 'vote_count']
 
 class MovieReferenceSerializer(serializers.ModelSerializer):
     detail = MovieDetailSerializer(read_only=True)

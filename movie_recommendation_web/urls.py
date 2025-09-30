@@ -25,6 +25,8 @@ urlpatterns = [
     path('api/', include("movies.urls")),
     path('api/', include('interactions.urls')),
     path('api/', include('watch.urls')),
+    path('api/',include('recommendations.urls')),
+    path('api/', include('preferences.urls')),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),  # Home page
 ]
