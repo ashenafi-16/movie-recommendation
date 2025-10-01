@@ -20,8 +20,13 @@ from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# for production
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+# for development
+# env = environ.Env()
+# environ.Env.read_env(os.path.join(BASE_DIR, ".env.dev"))
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
