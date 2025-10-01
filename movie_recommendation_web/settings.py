@@ -174,7 +174,9 @@ CORS_ALLOWED_ORIGINS = [
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_CREDENTIALS = True   # MUST for cookies across origins
 
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://movie-recommendation-22.onrender.com"
+]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
